@@ -9,10 +9,6 @@
 
 int main() {
 
-    initscr();
-    nodelay(stdscr, TRUE);
-    curs_set(0);
-    noecho();
 
     std::atomic_bool threadsStopped = false;
 
@@ -25,11 +21,6 @@ int main() {
 
     while (true) {
         numberOfIterations += 1;
-        // render->runRender();
-        // erase();
-        // std::this_thread::sleep_for(std::chrono::microseconds(16666));
-        // render->draw();
-        // refresh();
 
         if (render->stopFlag) {
             while (!threadsStopped) {
@@ -38,13 +29,13 @@ int main() {
             break;
         }
     }
+    std::cout << "Exiting" << std::endl;
 
     renderThread->join();
 
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::this_thread::sleep_for(std::chrono::seconds(1)); TODO: remove
 
-    endwin();
-    std::cout << numberOfIterations << std::endl << renderThread->joinable();
+    std::cout << numberOfIterations << std::endl << renderThread->joinable() << std::endl; // TODO: remove
     return 0;
 }
 
@@ -54,7 +45,7 @@ int main() {
 
 
 
-
+// TODO: remove all example code below
 // int main() {
 //
 //     // Ball ball;

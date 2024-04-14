@@ -5,6 +5,7 @@
 #include <atomic>
 #include <iostream>
 
+//TODO: modify this comment to describe the finished version of the class, add english version
 // konstruktor przyjmuje znak z którego będzie składał się obiekt
 // funkcja, która rysuje obiekt na ekranie / generuje jego kształt
 // zmienne przechowująca położenie, prędkość, kierunek
@@ -30,7 +31,6 @@ public:
 
 
 
-    // TODO - zrobić test: czy po wywołaniu run_ball() w wątku zmienia się x i y w obiekcie Ball
 
 
 
