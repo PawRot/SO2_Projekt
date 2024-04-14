@@ -12,4 +12,6 @@ add_executable(SO2_Projekt main.cpp
         objects/Rectangle.h
         utility/Render.cpp
         utility/Render.h
+        utility/ThreadCreator.cpp
+        utility/ThreadCreator.h
 )
