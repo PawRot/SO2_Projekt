@@ -17,6 +17,8 @@ class Ball {
     const int MAX_BOUNCES = 5;
     const int MAX_SPEED = 5;
 
+    std::vector<bool> colors; // stores which colors are in use
+
 
 
     int max_y, min_y; // maximum and minimum y coordinate of the ball
@@ -35,14 +37,17 @@ class Ball {
     void runBall(); // function that runs the ball
 
 
+
+
 public:
 
     int x,y; // x and y coordinates of the ball
+    int color; // color of the ball
 
     bool finished = false; // flag that indicates that the ball finished bouncing
 
 
-    Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag);
+    Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag, std::vector<bool> &colors);
     ~Ball();
 
 

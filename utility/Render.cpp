@@ -5,6 +5,13 @@ Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
     nodelay(stdscr, TRUE);
     curs_set(0);
     noecho();
+    start_color();
+
+    for(int i = 0; i < COLORS; i++) {
+        init_pair(i+1, i, COLOR_BLACK);
+    }
+
+    colors = std::vector(256, false);
 
     this->stopFlag = false;
     this->width = COLS - 2; // -2 to avoid border
@@ -12,7 +19,7 @@ Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
     this->threadsStoppedPtr = threadsStoppedPtr;
 
     this->ballSpawnThread = new std::thread(&Render::spawnBall, this);
-    this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
+    // this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
 
     rectangle = new Rectangle(width, height, &stopFlag);
     // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
@@ -70,9 +77,13 @@ void Render::runRender() {
 
 void Render::spawnBall() {
     while(stopFlag != true) {
-        auto ball = new Ball(width, height, &stopFlag);
+        auto ball = new Ball(width, height, &stopFlag, colors);
         balls.push_back(ball);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distr(1000, 1500);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(distr(gen)));
     }
 }
 
@@ -109,9 +120,17 @@ void Render::drawBalls() {
     for (const auto ball : balls) {
         if (ball->finished) {
             std::erase(balls, ball);
-            // delete ball;
+            delete ball;
         } else {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> distr(1, COLORS);
+            const auto color = ball->color;
+            attron(COLOR_PAIR(color));
+
             mvaddch(ball->y, ball->x, 'o');
+
+            attroff(COLOR_PAIR(color));
         }
     }
 }

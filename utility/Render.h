@@ -21,6 +21,7 @@ class Render {
     std::vector<Ball *> balls{}; // stores pointers to ball objects
     Rectangle *rectangle{}; // stores pointer to rectangle object
 
+
     std::thread *ballSpawnThread{};
     // std::thread *rectangleThread{};
 
@@ -47,6 +48,9 @@ class Render {
 
 
 public:
+    std::vector<bool> colors; // stores which colors are in use
+
+
     std::atomic_bool stopFlag; // flag that indicates that threads should stop
     std::atomic_bool keyPressed = false; // flag that indicates that key was pressed
     std::atomic_bool *threadsStoppedPtr; // pointer to a flag that indicates that threads stopped

@@ -1,8 +1,9 @@
 
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag, std::vector<bool> &colors) {
     this->stopFlag = stopFlag;
+    this->colors = colors;
 
     min_y = 0 + 1;
     max_y = windowHeight - 1;
@@ -14,6 +15,13 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag) {
 
     std::random_device rd;
     std::mt19937 gen(rd());
+
+    do {
+        std::uniform_int_distribution<> dist(0, 256);
+        color = dist(gen);
+    } while (colors[color]);
+
+    colors[color] = true;
 
     x = [&windowWidth, &rd, &gen] {
         const int width = windowWidth / 3;
@@ -31,6 +39,7 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag) {
 }
 
 Ball::~Ball() {
+    colors[color] = false;
     ballThread->join();
 }
 
