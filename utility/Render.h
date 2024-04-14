@@ -16,21 +16,20 @@
 
 class Render {
 
-    std::vector<Ball *> balls{};
-    Rectangle *rectangle{};
+    std::vector<Ball *> balls{}; // stores pointers to ball objects
+    Rectangle *rectangle{}; // stores pointer to rectangle object
 
     std::thread *ballSpawnThread{};
     std::thread *rectangleThread{};
-    std::thread *renderThread{};
 
 
     int x, y; // x - number of columns, y - number of rows
 
-    void spawnBall();
-    static void drawBorder();
+    void spawnBall(); // function that spawns a ball, runs in a separate thread
+    static void drawBorder(); // function that draws the border
 
 
-    bool checkKey();
+    bool checkKey(); // function that checks if key was pressed
 
     int number = 0;
 
@@ -38,8 +37,10 @@ class Render {
 
 public:
     std::atomic_bool stopFlag = false; // flag that indicates that threads should stop
+    std::atomic_bool keyPressed = false; // flag that indicates that key was pressed
+    std::atomic_bool *threadsStoppedPtr; // pointer to a flag that indicates that threads stopped
 
-    Render(int x, int y);
+    Render(int x, int y, std::atomic_bool *threadsStoppedPtr);
     ~Render();
 
     void stop();

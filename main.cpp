@@ -6,7 +6,6 @@
 #include "utility/Render.h"
 
 
-bool checkKey();
 
 int main() {
 
@@ -15,35 +14,41 @@ int main() {
     curs_set(0);
     noecho();
 
-    auto render = new Render(COLS, LINES);
+    std::atomic_bool threadsStopped = false;
+
+    auto render = new Render(COLS, LINES, &threadsStopped);
+
+    const auto renderThread = new std::thread(&Render::runRender, render);
+
+    int numberOfIterations = 0;
 
 
     while (true) {
-
+        numberOfIterations += 1;
         // render->runRender();
-        erase();
-        std::this_thread::sleep_for(std::chrono::microseconds(16666));
-        render->draw();
-        refresh();
+        // erase();
+        // std::this_thread::sleep_for(std::chrono::microseconds(16666));
+        // render->draw();
+        // refresh();
 
-        if (checkKey()) {
-            render->stop();
+        if (render->stopFlag) {
+            while (!threadsStopped) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
             break;
         }
     }
 
+    renderThread->join();
+
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
 
     endwin();
+    std::cout << numberOfIterations << std::endl << renderThread->joinable();
     return 0;
 }
 
-bool checkKey() {
-    if (const auto ch = getch(); ch == ' ') {
-        return true;
-    }
 
-    return  false;
-}
 
 
 
@@ -56,13 +61,13 @@ bool checkKey() {
 //     auto ball = new Ball();
 //
 //
+//     // dla Ball ball
+//     // std::thread ball_thread(&Ball::runBall, &ball);
+//     // std::thread ball_thread([&](){ return ball->runBall(); });
 //
-//     // std::thread ball_thread(&Ball::run_ball, &ball);
-//     // std::thread ball_thread([&](){ return ball.run_ball(); });
-//
-//
-//     // std::thread ball_thread(&Ball::run_ball, ball);
-//     std::thread ball_thread([&](){ return ball->run_ball(); });
+//     // dla wskaźnika Ball *ball
+//     std::thread ball_thread(&Ball::runBall, ball);
+//     // std::thread ball_thread([&](){ return ball->runBall(); });
 //
 //     ball_thread.join(); // wait for the thread to finish
 //

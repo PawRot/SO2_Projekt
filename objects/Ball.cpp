@@ -8,9 +8,7 @@ Ball::Ball() {
     speed = 5;
 }
 
-Ball::~Ball() {
-
-}
+Ball::~Ball() = default;
 
 Ball::Ball(const Ball& ball) {
     std::cout << "I am being copied" << std::endl;
@@ -22,12 +20,6 @@ Ball::Ball(const Ball& ball) {
 void Ball::runBall() {
     x = 2;
     y = x + 1;
-
-
-
-
-
-
 
     if (bounces == 5 ) {
         delete this;
