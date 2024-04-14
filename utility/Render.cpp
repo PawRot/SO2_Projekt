@@ -12,7 +12,7 @@ Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
     this->threadsStoppedPtr = threadsStoppedPtr;
 
     this->ballSpawnThread = new std::thread(&Render::spawnBall, this);
-    // this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
+    this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
 
     rectangle = new Rectangle(width, height, &stopFlag);
     // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
@@ -69,6 +69,11 @@ void Render::runRender() {
 }
 
 void Render::spawnBall() {
+    while(stopFlag != true) {
+        auto ball = new Ball(width, height, &stopFlag);
+        balls.push_back(ball);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
 }
 
 void Render::drawBorder() {
@@ -101,11 +106,20 @@ void Render::drawRectangle() {
 }
 
 void Render::drawBalls() {
+    for (const auto ball : balls) {
+        if (ball->finished) {
+            std::erase(balls, ball);
+            // delete ball;
+        } else {
+            mvaddch(ball->y, ball->x, 'o');
+        }
+    }
 }
 
 void Render::draw() {
     drawBorder();
     drawRectangle();
+    drawBalls();
     // auto str = (std::to_string(number) + "\n").c_str();
     // addstr(str);
     // number += 1;

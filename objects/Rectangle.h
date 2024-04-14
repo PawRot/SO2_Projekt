@@ -23,6 +23,8 @@ class Rectangle {
     std::atomic_bool *stopFlag; // flag that indicates that the rectangle should stop
 
     int generateSpeed(); // function that generates speed of the rectangle
+    void runRectangle();
+
 
 public:
     int x, y; //x and y coordinates of the top left corner of the rectangle
@@ -33,7 +35,6 @@ public:
     ~Rectangle();
 
 
-    void runRectangle();
 
 
     // double temp_y;

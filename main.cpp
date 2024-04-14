@@ -16,13 +16,11 @@ int main() {
 
     const auto renderThread = new std::thread(&Render::runRender, render);
 
-    int numberOfIterations = 0;
 
 ;
 
 
     while (true) {
-        numberOfIterations += 1;
 
         if (render->stopFlag) {
             while (!threadsStopped) {
@@ -33,14 +31,13 @@ int main() {
     }
     std::cout << "Exiting" << std::endl;
 
-    std::cout << LINES << std::endl << COLS << std::endl; // TODO: remove
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::cout << LINES << std::endl << COLS << std::endl; // TODO: remove
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
 
     renderThread->join();
 
     // std::this_thread::sleep_for(std::chrono::seconds(1)); TODO: remove
 
-    std::cout << numberOfIterations << std::endl << renderThread->joinable() << std::endl; // TODO: remove
     return 0;
 }
 
