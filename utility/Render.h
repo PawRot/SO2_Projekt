@@ -22,13 +22,22 @@ class Render {
     Rectangle *rectangle{}; // stores pointer to rectangle object
 
     std::thread *ballSpawnThread{};
-    std::thread *rectangleThread{};
+    // std::thread *rectangleThread{};
+
+    const int RENDER_SLEEP_TIME = 16666; // time in microseconds between each render
 
 
-    int x, y; // x - number of columns, y - number of rows
+    int width, height; // width - number of columns, height - number of rows
 
     void spawnBall(); // function that spawns a ball, runs in a separate thread
-    static void drawBorder(); // function that draws the border
+
+    void drawBorder(); // function that draws the border
+    void drawRectangle(); // function that draws the rectangle
+    void drawBalls(); // function that draws the balls
+
+
+    void stop(); // function that stops the render and deletes the object
+    void draw(); // function that draws the objects
 
 
     bool checkKey(); // function that checks if key was pressed
@@ -38,16 +47,14 @@ class Render {
 
 
 public:
-    std::atomic_bool stopFlag = false; // flag that indicates that threads should stop
+    std::atomic_bool stopFlag; // flag that indicates that threads should stop
     std::atomic_bool keyPressed = false; // flag that indicates that key was pressed
     std::atomic_bool *threadsStoppedPtr; // pointer to a flag that indicates that threads stopped
 
     Render(int x, int y, std::atomic_bool *threadsStoppedPtr);
     ~Render();
 
-    void stop();
-    void draw();
-    void runRender();
+    void runRender(); // function that runs the render
 
 };
 

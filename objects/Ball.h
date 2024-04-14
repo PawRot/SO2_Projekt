@@ -12,6 +12,8 @@
 
 class Ball {
 
+    const int MAX_BOUNCES = 5;
+
     int bounces = 0;
     int x,y;
     int speed;

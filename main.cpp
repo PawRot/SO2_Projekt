@@ -18,6 +18,8 @@ int main() {
 
     int numberOfIterations = 0;
 
+;
+
 
     while (true) {
         numberOfIterations += 1;
@@ -30,6 +32,9 @@ int main() {
         }
     }
     std::cout << "Exiting" << std::endl;
+
+    std::cout << LINES << std::endl << COLS << std::endl; // TODO: remove
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     renderThread->join();
 

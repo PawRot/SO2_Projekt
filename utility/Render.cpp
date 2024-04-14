@@ -1,15 +1,21 @@
 #include "Render.h"
 
 Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
-    this->x = x;
-    this->y = y;
+    initscr();
+    nodelay(stdscr, TRUE);
+    curs_set(0);
+    noecho();
+
+    this->stopFlag = false;
+    this->width = COLS - 2; // -2 to avoid border
+    this->height = LINES - 2;
     this->threadsStoppedPtr = threadsStoppedPtr;
 
     this->ballSpawnThread = new std::thread(&Render::spawnBall, this);
     // this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
 
-    auto rectangle = new Rectangle();
-    this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
+    rectangle = new Rectangle(width, height, &stopFlag);
+    // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
 
 
 }
@@ -21,7 +27,8 @@ Render::~Render() {
 
 
     ballSpawnThread->join();
-    rectangleThread->join();
+    delete rectangle;
+    // rectangleThread->join();
 
     for (const auto ball : balls) {
     delete ball;
@@ -29,7 +36,6 @@ Render::~Render() {
 
     balls.clear();
 
-    delete rectangle;
 
 
     endwin();
@@ -44,14 +50,14 @@ void Render::stop() {
 
 void Render::runRender() {
 
-    initscr();
-    nodelay(stdscr, TRUE);
-    curs_set(0);
-    noecho();
+    // initscr();
+    // nodelay(stdscr, TRUE);
+    // curs_set(0);
+    // noecho();
 
     while(true) {
         erase();
-        std::this_thread::sleep_for(std::chrono::microseconds(16666));
+        std::this_thread::sleep_for(std::chrono::microseconds(RENDER_SLEEP_TIME));
         draw();
         refresh();
 
@@ -66,12 +72,43 @@ void Render::spawnBall() {
 }
 
 void Render::drawBorder() {
+    border(0, 0, 0, 0, 0, 0, 0, 0);
+    // border('0', '0', '0', '0', '0', '0', '0', '0');
+
+}
+
+
+void Render::drawRectangle() {
+    const auto &x = rectangle->x;
+    const auto &y = rectangle->y;
+    const auto &height = rectangle->height;
+    const auto &width = rectangle->width;
+
+    // Draw top and bottom
+    mvhline(y, x, 0, width);
+    mvhline(y + height, x, 0, width);
+
+    // Draw left and right
+    mvvline(y, x, 0, height);
+    mvvline(y, x + width, 0, height);
+
+    mvaddch(y, x, '+'); // top-left corner
+    mvaddch(y, x + width, '+'); // top-right corner
+    mvaddch(y + height, x, '+'); // bottom-left corner
+    mvaddch(y + height, x + width, '+'); // bottom-right corner
+
+
+}
+
+void Render::drawBalls() {
 }
 
 void Render::draw() {
-    auto str = (std::to_string(number) + "\n").c_str();
-    addstr(str);
-    number += 1;
+    drawBorder();
+    drawRectangle();
+    // auto str = (std::to_string(number) + "\n").c_str();
+    // addstr(str);
+    // number += 1;
 }
 
 
