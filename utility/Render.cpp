@@ -92,10 +92,10 @@ void Render::drawRectangle() {
     mvvline(y, x, 0, height);
     mvvline(y, x + width, 0, height);
 
-    mvaddch(y, x, '+'); // top-left corner
-    mvaddch(y, x + width, '+'); // top-right corner
-    mvaddch(y + height, x, '+'); // bottom-left corner
-    mvaddch(y + height, x + width, '+'); // bottom-right corner
+    mvaddch(y, x, ACS_ULCORNER); // top-left corner
+    mvaddch(y, x + width, ACS_URCORNER); // top-right corner
+    mvaddch(y + height, x, ACS_LLCORNER); // bottom-left corner
+    mvaddch(y + height, x + width, ACS_LRCORNER); // bottom-right corner
 
 
 }

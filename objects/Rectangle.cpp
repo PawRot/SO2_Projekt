@@ -3,28 +3,27 @@
 
 Rectangle::Rectangle(int windowWidth, int windowHeight, std::atomic_bool *stopFlag) {
     this->stopFlag = stopFlag;
-    // width = [=](){ // lambda to calculate rectangle width
-    //     const int width = windowWidth / 10;
-    //     if (width % 2 == 0 ) return width;
-    //     return width - 1;
-    // }();
-    // height = [=] {
-    //     const int height = windowHeight / 5;
-    //     if (height % 2 == 0) return height;
-    //     return height - 1;
-    // }();
+    width = [=](){ // lambda to calculate rectangle width
+        const int width = windowWidth / 10;
+        if (width % 2 == 0 ) return width;
+        return width - 1;
+    }();
+    height = [=] {
+        const int height = windowHeight / 5;
+        if (height % 2 == 0) return height;
+        return height - 1;
+    }();
 
-    width = 5;
-    height = 5;
 
     max_y = windowHeight - height;
-    // max_y = 19 - 1;
     min_y = 0 + 1;
 
-    x = windowWidth / 2; // TODO: change x position to be selected based on window width
+    x = windowWidth / 8;
     y = windowHeight / 2;
 
     speed = generateSpeed();
+
+    // temp_y = y;
 
     this->rectangleThread = new std::thread(&Rectangle::runRectangle, this);
 }
@@ -35,6 +34,8 @@ Rectangle::~Rectangle() {
 
 void Rectangle::runRectangle() {
     while (*stopFlag != true) {
+        // temp_y = temp_y + 0.000000008 * speed * direction;
+        // y = static_cast<int>(temp_y);
         y = y + 1 * direction;
         if (y >= max_y || y <= min_y) {
             if (y >= max_y) {
@@ -46,7 +47,7 @@ void Rectangle::runRectangle() {
             speed = generateSpeed();
             direction = -direction;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100 /  speed));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100 / speed));
     }
 }
 
