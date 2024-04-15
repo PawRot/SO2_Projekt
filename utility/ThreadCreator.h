@@ -2,7 +2,7 @@
 #ifndef SO2_PROJEKT_THREADCREATOR_H
 #define SO2_PROJEKT_THREADCREATOR_H
 
-// funkcja, która tworzy nowe wątki
+
 
 
 class ThreadCreator {

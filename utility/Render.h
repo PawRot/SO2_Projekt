@@ -8,13 +8,6 @@
 #include "../objects/Rectangle.h"
 
 
-// TODO: rewrite this comment so it describes the finished version of the program, add english version
-// funkcja, która rysuje obiekty na ekranie
-//Ncurses nie jest wielowejściowe - wszystkie funkcje Ncurses w jednym wątku (prawdopodobnie w tym)
-//
-//Nie używać standardowego wejścia wyjścia z C++ w Ncurses
-//
-//Kulki wątkami + wątki techniczne + prawdopodobnie wątek do generowania nowych wątków
 
 class Render {
 

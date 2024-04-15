@@ -7,10 +7,7 @@
 #include <random>
 
 
-//TODO: modify this comment to describe the finished version of the class, add english version
-// konstruktor przyjmuje znak z którego będzie składał się obiekt
-// funkcja, która rysuje obiekt na ekranie / generuje jego kształt
-// zmienne przechowująca położenie, prędkość, kierunek
+
 
 class Ball {
 
