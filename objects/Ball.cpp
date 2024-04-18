@@ -1,6 +1,6 @@
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>&colors) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>*colors) {
     this->stopFlag = stopFlag;
     this->colors = colors;
 
@@ -16,12 +16,12 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
     std::mt19937 gen(rd());
 
     do {
-        std::uniform_int_distribution<> dist(0, 256);
+        std::uniform_int_distribution<> dist(0, 255);
         color = dist(gen);
     }
-    while (colors[color]);
+    while (colors->at(color)); // check if color is already in use
 
-    colors[color] = true;
+    colors->at(color) = true;
 
     x = [&windowWidth, &rd, &gen] {
         const int width = windowWidth / 3;
@@ -37,7 +37,7 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 }
 
 Ball::~Ball() {
-    colors[color] = false;
+    colors->at(color) = false;
     ballThread->join();
 }
 

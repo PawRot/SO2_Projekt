@@ -14,7 +14,7 @@ class Ball {
     const int MAX_BOUNCES = 5;
     const int MAX_SPEED = 5;
 
-    std::vector<bool> colors; // stores which colors are in use
+    std::vector<bool> *colors; // pointer to vector that stores which colors are in use
 
 
 
@@ -44,7 +44,7 @@ public:
     bool finished = false; // flag that indicates that the ball finished bouncing
 
 
-    Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag, std::vector<bool> &colors);
+    Ball(int windowWidth, int windowHeight, std::atomic_bool *stopFlag, std::vector<bool> *colors);
     ~Ball();
 
 

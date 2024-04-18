@@ -41,7 +41,7 @@ class Render {
 
 
 public:
-    std::vector<bool> colors; // stores which colors are in use
+    std::vector<bool> colors; // vector that stores which colors are in use
 
 
     std::atomic_bool stopFlag; // flag that indicates that threads should stop

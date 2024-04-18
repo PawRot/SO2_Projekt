@@ -44,7 +44,6 @@ Render::~Render() {
     balls.clear();
 
 
-
     endwin();
    *threadsStoppedPtr = true;
 }
@@ -77,7 +76,7 @@ void Render::runRender() {
 
 void Render::spawnBall() {
     while(stopFlag != true) {
-        auto ball = new Ball(width, height, &stopFlag, colors);
+        auto ball = new Ball(width, height, &stopFlag, &colors);
         balls.push_back(ball);
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -127,8 +126,14 @@ void Render::drawBalls() {
             std::uniform_int_distribution<> distr(1, COLORS);
             const auto color = ball->color;
             attron(COLOR_PAIR(color));
-
+            auto centerX = ball->x;
+            auto centerY = ball->y;
             mvaddch(ball->y, ball->x, 'o');
+
+            // mvaddch(centerY - 1, centerX, '-');
+            // mvaddch(centerY, centerX - 1, '(');
+            // mvaddch(centerY, centerX + 1, ')');
+            // mvaddch(centerY + 1, centerX, '-');
 
             attroff(COLOR_PAIR(color));
         }
