@@ -1,11 +1,11 @@
-
 #include "Rectangle.h"
 
-Rectangle::Rectangle(int windowWidth, int windowHeight, std::atomic_bool *stopFlag) {
+Rectangle::Rectangle(int windowWidth, int windowHeight, std::atomic_bool* stopFlag) {
     this->stopFlag = stopFlag;
-    width = [=](){ // lambda to calculate rectangle width
+    width = [=]() {
+        // lambda to calculate rectangle width
         const int width = windowWidth / 10;
-        if (width % 2 == 0 ) return width;
+        if (width % 2 == 0) return width;
         return width - 1;
     }();
     height = [=] {
@@ -23,7 +23,6 @@ Rectangle::Rectangle(int windowWidth, int windowHeight, std::atomic_bool *stopFl
 
     speed = generateSpeed();
 
-    // temp_y = y;
 
     this->rectangleThread = new std::thread(&Rectangle::runRectangle, this);
 }
@@ -34,13 +33,12 @@ Rectangle::~Rectangle() {
 
 void Rectangle::runRectangle() {
     while (*stopFlag != true) {
-        // temp_y = temp_y + 0.000000008 * speed * direction;
-        // y = static_cast<int>(temp_y);
         y = y + 1 * direction;
         if (y >= max_y || y <= min_y) {
             if (y >= max_y) {
                 y = max_y;
-            } else {
+            }
+            else {
                 y = min_y;
             }
 

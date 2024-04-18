@@ -1,14 +1,14 @@
 #include "Render.h"
 
-Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
+Render::Render(const int x, const int y, std::atomic_bool* threadsStoppedPtr) {
     initscr();
     nodelay(stdscr, TRUE);
     curs_set(0);
     noecho();
     start_color();
 
-    for(int i = 0; i < COLORS; i++) {
-        init_pair(i+1, i, COLOR_BLACK);
+    for (int i = 0; i < COLORS; i++) {
+        init_pair(i + 1, i, COLOR_BLACK);
     }
 
     colors = std::vector(256, false);
@@ -23,8 +23,6 @@ Render::Render(const int x, const int y, std::atomic_bool *threadsStoppedPtr) {
 
     rectangle = new Rectangle(width, height, &stopFlag);
     // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
-
-
 }
 
 Render::~Render() {
@@ -37,37 +35,30 @@ Render::~Render() {
     delete rectangle;
     // rectangleThread->join();
 
-    for (const auto ball : balls) {
-    delete ball;
+    for (const auto ball: balls) {
+        delete ball;
     }
 
     balls.clear();
 
-
+    mtx.unlock();
     endwin();
-   *threadsStoppedPtr = true;
+    *threadsStoppedPtr = true;
 }
 
 void Render::stop() {
-
     stopFlag = true;
     delete this;
 }
 
 void Render::runRender() {
-
-    // initscr();
-    // nodelay(stdscr, TRUE);
-    // curs_set(0);
-    // noecho();
-
-    while(true) {
+    while (true) {
         erase();
         std::this_thread::sleep_for(std::chrono::microseconds(RENDER_SLEEP_TIME));
         draw();
         refresh();
 
-        if(checkKey()) {
+        if (checkKey()) {
             break;
         }
     }
@@ -75,7 +66,7 @@ void Render::runRender() {
 }
 
 void Render::spawnBall() {
-    while(stopFlag != true) {
+    while (stopFlag != true) {
         auto ball = new Ball(width, height, &stopFlag, &colors);
         balls.push_back(ball);
         std::random_device rd;
@@ -89,15 +80,14 @@ void Render::spawnBall() {
 void Render::drawBorder() {
     border(0, 0, 0, 0, 0, 0, 0, 0);
     // border('0', '0', '0', '0', '0', '0', '0', '0');
-
 }
 
 
 void Render::drawRectangle() {
-    const auto &x = rectangle->x;
-    const auto &y = rectangle->y;
-    const auto &height = rectangle->height;
-    const auto &width = rectangle->width;
+    const auto&x = rectangle->x;
+    const auto&y = rectangle->y;
+    const auto&height = rectangle->height;
+    const auto&width = rectangle->width;
 
     // Draw top and bottom
     mvhline(y, x, 0, width);
@@ -111,24 +101,25 @@ void Render::drawRectangle() {
     mvaddch(y, x + width, ACS_URCORNER); // top-right corner
     mvaddch(y + height, x, ACS_LLCORNER); // bottom-left corner
     mvaddch(y + height, x + width, ACS_LRCORNER); // bottom-right corner
-
-
 }
 
 void Render::drawBalls() {
-    for (const auto ball : balls) {
+    mtx.lock();
+    for (const auto ball: balls) {
         if (ball->finished) {
             std::erase(balls, ball);
             delete ball;
-        } else {
+        }
+        else {
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<> distr(1, COLORS);
             const auto color = ball->color;
             attron(COLOR_PAIR(color));
-            auto centerX = ball->x;
-            auto centerY = ball->y;
             mvaddch(ball->y, ball->x, 'o');
+
+            // auto centerX = ball->x;
+            // auto centerY = ball->y;
 
             // mvaddch(centerY - 1, centerX, '-');
             // mvaddch(centerY, centerX - 1, '(');
@@ -138,6 +129,7 @@ void Render::drawBalls() {
             attroff(COLOR_PAIR(color));
         }
     }
+    mtx.unlock();
 }
 
 void Render::draw() {
@@ -155,6 +147,5 @@ bool Render::checkKey() {
         return true;
     }
 
-    return  false;
+    return false;
 }
-

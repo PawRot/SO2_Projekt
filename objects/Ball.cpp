@@ -1,6 +1,6 @@
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>*colors) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors) {
     this->stopFlag = stopFlag;
     this->colors = colors;
 
@@ -58,7 +58,7 @@ void Ball::runBall() {
                 y = min_y;
             }
 
-            if (chance(gen) < 25) {
+            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
                 if (horizontalDirection == 0) {
                     if (chance(gen) < 50) {
                         horizontalDirection = 1;
@@ -86,7 +86,7 @@ void Ball::runBall() {
             }
 
 
-            if (chance(gen) < 25) {
+            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
                 if (verticalDirection == 0) {
                     if (chance(gen) < 50) {
                         verticalDirection = 1;

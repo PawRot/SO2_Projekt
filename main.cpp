@@ -1,27 +1,19 @@
 #include <iostream>
+#include<print>
 #include <thread>
 #include <ncurses.h>
-#include "objects/Ball.h"
-#include "objects/Rectangle.h"
 #include "utility/Render.h"
 
 
-
 int main() {
-
-
     std::atomic_bool threadsStopped = false;
 
     auto render = new Render(COLS, LINES, &threadsStopped);
 
-    const auto renderThread = new std::thread(&Render::runRender, render);
-
-
-;
+    const auto renderThread = new std::thread(&Render::runRender, render);;
 
 
     while (true) {
-
         if (render->stopFlag) {
             while (!threadsStopped) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -29,22 +21,15 @@ int main() {
             break;
         }
     }
-    std::cout << "Exiting" << std::endl;
+    // std::cout << "Exiting" << std::endl;
+    std::println("Exiting");
 
-    // std::cout << LINES << std::endl << COLS << std::endl; // TODO: remove
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
 
     renderThread->join();
 
-    // std::this_thread::sleep_for(std::chrono::seconds(1)); TODO: remove
 
     return 0;
 }
-
-
-
-
-
 
 
 // TODO: remove all example code below
