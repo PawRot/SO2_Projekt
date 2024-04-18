@@ -11,7 +11,7 @@ class Rectangle {
 
     int max_y, min_y; // maximum and minimum y coordinate of the top left of the rectangle
     int speed; // speed of the rectangle
-    int direction = 1; // direction of the rectangle (1 - down , -1 - up)
+    int direction = 1; // direction of the rectangle (1 - down, -1 - up)
 
     std::thread* rectangleThread{}; // thread that runs the rectangle
 

@@ -1,6 +1,6 @@
 #include "Render.h"
 
-Render::Render(const int x, const int y, std::atomic_bool* threadsStoppedPtr) {
+Render::Render(std::atomic_bool* threadsStoppedPtr) {
     initscr();
     nodelay(stdscr, TRUE);
     curs_set(0);

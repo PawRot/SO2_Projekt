@@ -42,7 +42,7 @@ public:
     std::atomic_bool keyPressed = false; // flag that indicates that key was pressed
     std::atomic_bool* threadsStoppedPtr; // pointer to a flag that indicates that threads stopped
 
-    Render(int x, int y, std::atomic_bool* threadsStoppedPtr);
+    Render(std::atomic_bool* threadsStoppedPtr);
 
     ~Render();
 
