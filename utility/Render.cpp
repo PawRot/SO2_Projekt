@@ -33,7 +33,6 @@ Render::~Render() {
 
     ballSpawnThread->join();
     delete rectangle;
-    // rectangleThread->join();
 
     for (const auto ball: balls) {
         delete ball;
@@ -41,8 +40,10 @@ Render::~Render() {
 
     balls.clear();
 
-    mtx.unlock();
+
     endwin();
+    delete ballSpawnThread;
+
     *threadsStoppedPtr = true;
 }
 
@@ -67,8 +68,11 @@ void Render::runRender() {
 
 void Render::spawnBall() {
     while (stopFlag != true) {
-        auto ball = new Ball(width, height, &stopFlag, &colors);
-        balls.push_back(ball);
+        {
+            std::unique_lock spawnLock(mtx);
+            auto ball = new Ball(width, height, &stopFlag, &colors);
+            balls.push_back(ball);
+        }
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr(1000, 1500);
@@ -79,7 +83,6 @@ void Render::spawnBall() {
 
 void Render::drawBorder() {
     border(0, 0, 0, 0, 0, 0, 0, 0);
-    // border('0', '0', '0', '0', '0', '0', '0', '0');
 }
 
 
@@ -104,41 +107,26 @@ void Render::drawRectangle() {
 }
 
 void Render::drawBalls() {
-    mtx.lock();
+    std::unique_lock drawLock(mtx);
     for (const auto ball: balls) {
         if (ball->finished) {
             std::erase(balls, ball);
             delete ball;
         }
         else {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> distr(1, COLORS);
             const auto color = ball->color;
             attron(COLOR_PAIR(color));
             mvaddch(ball->y, ball->x, 'o');
-
-            // auto centerX = ball->x;
-            // auto centerY = ball->y;
-
-            // mvaddch(centerY - 1, centerX, '-');
-            // mvaddch(centerY, centerX - 1, '(');
-            // mvaddch(centerY, centerX + 1, ')');
-            // mvaddch(centerY + 1, centerX, '-');
-
             attroff(COLOR_PAIR(color));
         }
     }
-    mtx.unlock();
+
 }
 
 void Render::draw() {
     drawBorder();
     drawRectangle();
     drawBalls();
-    // auto str = (std::to_string(number) + "\n").c_str();
-    // addstr(str);
-    // number += 1;
 }
 
 

@@ -25,10 +25,12 @@ Rectangle::Rectangle(int windowWidth, int windowHeight, std::atomic_bool* stopFl
 
 
     this->rectangleThread = new std::thread(&Rectangle::runRectangle, this);
+
 }
 
 Rectangle::~Rectangle() {
     rectangleThread->join();
+    delete rectangleThread;
 };
 
 void Rectangle::runRectangle() {

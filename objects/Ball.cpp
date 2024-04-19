@@ -5,9 +5,9 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
     this->colors = colors;
 
     min_y = 0 + 1;
-    max_y = windowHeight - 1;
+    max_y = windowHeight;
     min_x = 0 + 1;
-    max_x = windowWidth - 1;
+    max_x = windowWidth;
     speed = generateSpeed();
 
     y = max_y;
@@ -39,6 +39,7 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 Ball::~Ball() {
     colors->at(color) = false;
     ballThread->join();
+    delete ballThread;
 }
 
 void Ball::runBall() {
