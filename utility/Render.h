@@ -1,4 +1,3 @@
-
 #ifndef SO2_PROJEKT_RENDER_H
 #define SO2_PROJEKT_RENDER_H
 #include <vector>
@@ -8,15 +7,12 @@
 #include "../objects/Rectangle.h"
 
 
-
 class Render {
-
     std::vector<Ball *> balls{}; // stores pointers to ball objects
-    Rectangle *rectangle{}; // stores pointer to rectangle object
+    Rectangle* rectangle{}; // stores pointer to rectangle object
 
 
-    std::thread *ballSpawnThread{};
-    // std::thread *rectangleThread{};
+    std::thread* ballSpawnThread{};
 
     const int RENDER_SLEEP_TIME = 16666; // time in microseconds between each render
 
@@ -38,21 +34,19 @@ class Render {
 
     int number = 0;
 
-
-
 public:
-    std::vector<bool> colors; // stores which colors are in use
-
+    std::vector<bool> colors; // vector that stores which colors are in use
+    std::mutex mtx;
 
     std::atomic_bool stopFlag; // flag that indicates that threads should stop
     std::atomic_bool keyPressed = false; // flag that indicates that key was pressed
-    std::atomic_bool *threadsStoppedPtr; // pointer to a flag that indicates that threads stopped
+    std::atomic_bool* threadsStoppedPtr; // pointer to a flag that indicates that threads stopped
 
-    Render(int x, int y, std::atomic_bool *threadsStoppedPtr);
+    Render(std::atomic_bool* threadsStoppedPtr);
+
     ~Render();
 
     void runRender(); // function that runs the render
-
 };
 
 
