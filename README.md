@@ -15,4 +15,4 @@ Projekt składa się z trzech etapów:
 - Do wizualizacji użyć biblioteki ncurses.
 
 Na etapie 2 dodać:
-- kulki odbjiają się od prostokąta.
+- Kulki odbjiają się od prostokąta.
