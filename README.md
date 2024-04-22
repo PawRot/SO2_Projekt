@@ -13,3 +13,6 @@ Projekt składa się z trzech etapów:
 - Prostokąt porusza się między poziomymi krawędziami, z prędkością zmienianą losowo po każdym odbiciu.
 - Program kończy się po naciśnięciu spacji.
 - Do wizualizacji użyć biblioteki ncurses.
+
+Na etapie 2 dodać:
+- kulki odbjiają się od prostokąta.
