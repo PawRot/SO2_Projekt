@@ -179,16 +179,21 @@ void Ball::runBall() {
                     }
                 }
 
-                if (horizontal && vertical) {
+                if (horizontal || vertical) {
                     horizontalDirection = -horizontalDirection;
                     verticalDirection = -verticalDirection;
                 }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
+
+                // if (horizontal && vertical) {
+                //     horizontalDirection = -horizontalDirection;
+                //     verticalDirection = -verticalDirection;
+                // }
+                // else if (horizontal) {
+                //     horizontalDirection = -horizontalDirection;
+                // }
+                // else if (vertical) {
+                //     verticalDirection = -verticalDirection;
+                // }
 
             }
             else if (horizontalDirection == -1 && verticalDirection == -1) { // left up
@@ -207,16 +212,21 @@ void Ball::runBall() {
                     }
                 }
 
-                if (horizontal && vertical) {
+                if (horizontal || vertical) {
                     horizontalDirection = -horizontalDirection;
                     verticalDirection = -verticalDirection;
                 }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
+
+                // if (horizontal && vertical) {
+                //     horizontalDirection = -horizontalDirection;
+                //     verticalDirection = -verticalDirection;
+                // }
+                // else if (horizontal) {
+                //     horizontalDirection = -horizontalDirection;
+                // }
+                // else if (vertical) {
+                //     verticalDirection = -verticalDirection;
+                // }
 
             }
             else if (horizontalDirection == 1 && verticalDirection == 1) { // right down
@@ -235,16 +245,21 @@ void Ball::runBall() {
                     }
                 }
 
-                if (horizontal && vertical) {
+                if (horizontal || vertical) {
                     horizontalDirection = -horizontalDirection;
                     verticalDirection = -verticalDirection;
                 }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
+
+                // if (horizontal && vertical) {
+                //     horizontalDirection = -horizontalDirection;
+                //     verticalDirection = -verticalDirection;
+                // }
+                // else if (horizontal) {
+                //     horizontalDirection = -horizontalDirection;
+                // }
+                // else if (vertical) {
+                //     verticalDirection = -verticalDirection;
+                // }
 
             }
             else if (horizontalDirection == -1 && verticalDirection == 1) { // left down
@@ -263,16 +278,21 @@ void Ball::runBall() {
                     }
                 }
 
-                if (horizontal && vertical) {
+                if (horizontal || vertical) {
                     horizontalDirection = -horizontalDirection;
                     verticalDirection = -verticalDirection;
                 }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
+
+                // if (horizontal && vertical) {
+                    // horizontalDirection = -horizontalDirection;
+                    // verticalDirection = -verticalDirection;
+                // }
+                // else if (horizontal) {
+                    // horizontalDirection = -horizontalDirection;
+                // }
+                // else if (vertical) {
+                    // verticalDirection = -verticalDirection;
+                // }
             }
         }
 
