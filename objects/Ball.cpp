@@ -52,69 +52,7 @@ void Ball::runBall() {
 
         // Check if the ball's x-coordinate is within the range
         // if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) lock.unlock();
-        y = y + 1 * verticalDirection;
-        x = x + 1 * horizontalDirection;
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> chance(0, 100);
 
-        if (y >= max_y || y <= min_y) {
-            if (y >= max_y) {
-                y = max_y;
-            }
-            else {
-                y = min_y;
-            }
-
-            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
-                if (horizontalDirection == 0) {
-                    if (chance(gen) < 50) {
-                        horizontalDirection = 1;
-                    }
-                    else {
-                        horizontalDirection = -1;
-                    }
-                }
-                else {
-                    horizontalDirection = 0;
-                }
-            }
-
-
-            verticalDirection = -verticalDirection;
-            bounces++;
-        }
-
-        if (x >= max_x || x <= min_x) {
-            if (x >= max_x) {
-                x = max_x;
-            }
-            else {
-                x = min_x;
-            }
-
-
-            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
-                if (verticalDirection == 0) {
-                    if (chance(gen) < 50) {
-                        verticalDirection = 1;
-                    }
-                    else {
-                        verticalDirection = -1;
-                    }
-                }
-                else {
-                    verticalDirection = 0;
-                }
-            }
-
-            horizontalDirection = -horizontalDirection;
-            bounces++;
-        }
-
-        if (bounces >= MAX_BOUNCES) {
-            finished = true;
-        }
 
 
         // for collisions with the rectangle, we only check the field in the direction in which the ball is moving
@@ -337,6 +275,76 @@ void Ball::runBall() {
                 }
             }
         }
+
+
+
+        y = y + 1 * verticalDirection;
+        x = x + 1 * horizontalDirection;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> chance(0, 100);
+
+        if (y >= max_y || y <= min_y) {
+            if (y >= max_y) {
+                y = max_y;
+            }
+            else {
+                y = min_y;
+            }
+
+            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
+                if (horizontalDirection == 0) {
+                    if (chance(gen) < 50) {
+                        horizontalDirection = 1;
+                    }
+                    else {
+                        horizontalDirection = -1;
+                    }
+                }
+                else {
+                    horizontalDirection = 0;
+                }
+            }
+
+
+            verticalDirection = -verticalDirection;
+            bounces++;
+        }
+
+        if (x >= max_x || x <= min_x) {
+            if (x >= max_x) {
+                x = max_x;
+            }
+            else {
+                x = min_x;
+            }
+
+
+            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
+                if (verticalDirection == 0) {
+                    if (chance(gen) < 50) {
+                        verticalDirection = 1;
+                    }
+                    else {
+                        verticalDirection = -1;
+                    }
+                }
+                else {
+                    verticalDirection = 0;
+                }
+            }
+
+            horizontalDirection = -horizontalDirection;
+            bounces++;
+        }
+
+        if (bounces >= MAX_BOUNCES) {
+            finished = true;
+        }
+
+
+
+
         if (lock.owns_lock()) {
             lock.unlock();
         }
