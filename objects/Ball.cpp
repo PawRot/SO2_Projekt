@@ -140,195 +140,23 @@ void Ball::runBall() {
         if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) {
             // The ball's x-coordinate is within the range
 
+            // Predict the ball's next position
+            int nextX = x + horizontalDirection;
+            int nextY = y + verticalDirection;
 
-            // possible mutex here, shared with rectangle
-            auto topEdgeCoordinates = rectanglePtr->topEdgeCoordinates;
-            auto bottomEdgeCoordinates = rectanglePtr->bottomEdgeCoordinates;
-            auto leftEdgeCoordinates = rectanglePtr->leftEdgeCoordinates;
-            auto rightEdgeCoordinates = rectanglePtr->rightEdgeCoordinates;
+            // Get the rectangle's position and size
+            int rectY = rectanglePtr->y;
+            int rectHeight = rectanglePtr->height;
 
-            // also check if the ball is in the rectangle's edge
-            if (horizontalDirection == 1 && verticalDirection == 0) { // right
-                for (auto& edge : leftEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) || x == std::get<0>(edge)) && y == std::get<1>(edge)) {
-                        horizontalDirection = -horizontalDirection;
-                        break;
-                    }
-                }
+            // Check if the next position is within the rectangle's boundaries
+            if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight) {
+                // The ball's next position will intersect with the rectangle
 
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == -1) {
-                            verticalDirection = -1;
-                        }
-                        break;
-                    }
-                }
-
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == 1) {
-                            verticalDirection = 1;
-                        }
-                        break;
-                    }
-                }
+                // Reverse the ball's direction
+                horizontalDirection = -horizontalDirection;
+                verticalDirection = -verticalDirection;
             }
-            else if (horizontalDirection == -1 && verticalDirection == 0) { // left
-                for (auto& edge : rightEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) || x == std::get<0>(edge)) && y == std::get<1>(edge)) {
-                        horizontalDirection = -horizontalDirection;
-                        break;
-                    }
-                }
 
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == -1) {
-                            verticalDirection = -1;
-                        }
-                        break;
-                    }
-                }
-
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == 1) {
-                            verticalDirection = 1;
-                        }
-                        break;
-                    }
-                }
-
-            }
-            else if (horizontalDirection == 0 && verticalDirection == -1) { // up
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        verticalDirection = -verticalDirection;
-                        break;
-                    }
-                }
-            }
-            else if (horizontalDirection == 0 && verticalDirection == 1) { // down
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        verticalDirection = -verticalDirection;
-                        break;
-                    }
-                }
-
-            } // rewrite this part, so that it check vertical, horizontal and diagonal fields
-            else if (horizontalDirection == 1 && verticalDirection == -1) { // right up
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : leftEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal && vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
-
-            }
-            else if (horizontalDirection == -1 && verticalDirection == -1) { // left up
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : rightEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal && vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
-
-            }
-            else if (horizontalDirection == 1 && verticalDirection == 1) { // right down
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : leftEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal && vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
-
-            }
-            else if (horizontalDirection == -1 && verticalDirection == 1) { // left down
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : rightEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal && vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-                else if (horizontal) {
-                    horizontalDirection = -horizontalDirection;
-                }
-                else if (vertical) {
-                    verticalDirection = -verticalDirection;
-                }
-            }
         }
         lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(100 / speed));
