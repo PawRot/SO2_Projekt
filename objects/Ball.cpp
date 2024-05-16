@@ -45,6 +45,13 @@ Ball::~Ball() {
 
 void Ball::runBall() {
     while (*stopFlag != true && bounces < MAX_BOUNCES) {
+        std::unique_lock lock(rectanglePtr->mtx);
+
+        int rectX = rectanglePtr->x;
+        int rectWidth = rectanglePtr->width;
+
+        // Check if the ball's x-coordinate is within the range
+        // if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) lock.unlock();
         y = y + 1 * verticalDirection;
         x = x + 1 * horizontalDirection;
         std::random_device rd;
@@ -131,10 +138,10 @@ void Ball::runBall() {
         // check if the ball x coordinate is in the range of the rectangle x coordinates + 10
         // Get the rectangle's x-coordinate and width
 
-        std::unique_lock lock(rectanglePtr->mtx);
+        // std::unique_lock lock(rectanglePtr->mtx);
 
-        int rectX = rectanglePtr->x;
-        int rectWidth = rectanglePtr->width;
+        // int rectX = rectanglePtr->x;
+        // int rectWidth = rectanglePtr->width;
 
         // Check if the ball's x-coordinate is within the range
         if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) {
@@ -330,7 +337,10 @@ void Ball::runBall() {
                 }
             }
         }
-        lock.unlock();
+        if (lock.owns_lock()) {
+            lock.unlock();
+        }
+        // lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(100 / speed));
 
     }
