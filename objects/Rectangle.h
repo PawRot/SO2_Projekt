@@ -37,6 +37,10 @@ public:
     Rectangle(int windowWidth, int windowHeight, std::atomic_bool* stopFlag);
 
     ~Rectangle();
+
+    [[nodiscard]] int getVerticalDirection() const {
+        return direction;
+    }
 };
 
 

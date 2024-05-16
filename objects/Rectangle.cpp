@@ -53,7 +53,7 @@ void Rectangle::runRectangle() {
 
         // calculate the coordinates of the edges of the rectangle
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(500 / speed));
+        std::this_thread::sleep_for(std::chrono::milliseconds(250 / speed));
     }
 }
 
