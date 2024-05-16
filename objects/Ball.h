@@ -5,6 +5,8 @@
 #include <thread>
 #include <random>
 
+#include "Rectangle.h"
+
 
 class Ball {
     const int MAX_BOUNCES = 5;
@@ -22,11 +24,13 @@ class Ball {
     int horizontalDirection; // 1 - right, -1 - left, 0 - no movement
     int verticalDirection = -1; // 1 - down, -1 - up, 0 - no movement
 
+    Rectangle* rectanglePtr; // pointer to the rectangle
+
     std::thread* ballThread; // thread that runs the ball
 
     std::atomic_bool* stopFlag; // flag that indicates that the ball should stop
 
-    int generateSpeed(); // function that generates speed of the ball
+    [[nodiscard]] int generateSpeed() const; // function that generates speed of the ball
     void runBall(); // function that runs the ball
 
 
@@ -37,7 +41,7 @@ public:
     bool finished = false; // flag that indicates that the ball finished bouncing
 
 
-    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors);
+    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr);
 
     ~Ball();
 };

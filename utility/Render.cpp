@@ -18,11 +18,13 @@ Render::Render(std::atomic_bool* threadsStoppedPtr) {
     this->height = LINES - 2;
     this->threadsStoppedPtr = threadsStoppedPtr;
 
+
+    // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
+    rectangle = new Rectangle(width, height, &stopFlag);
+
+
     this->ballSpawnThread = new std::thread(&Render::spawnBall, this);
     // this->ballSpawnThread = new std::thread([this] {spawnBall();}); // lambda syntax
-
-    rectangle = new Rectangle(width, height, &stopFlag);
-    // this->rectangleThread = new std::thread(&Rectangle::runRectangle, rectangle);
 }
 
 Render::~Render() {
@@ -70,7 +72,7 @@ void Render::spawnBall() {
     while (stopFlag != true) {
         {
             std::unique_lock spawnLock(mtx);
-            auto ball = new Ball(width, height, &stopFlag, &colors);
+            auto ball = new Ball(width, height, &stopFlag, &colors, rectangle);
             balls.push_back(ball);
         }
         std::random_device rd;
