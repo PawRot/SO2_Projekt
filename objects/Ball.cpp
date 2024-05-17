@@ -167,13 +167,13 @@ void Ball::runBall() {
                 bool horizontal = false;
                 bool vertical = false;
                 for (auto& edge : leftEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
+                    if ((x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         horizontal = true;
                         break;
                     }
                 }
                 for (auto& edge : bottomEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
+                    if ((x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))){
                         vertical = true;
                         break;
                     }
@@ -200,13 +200,13 @@ void Ball::runBall() {
                 bool horizontal = false;
                 bool vertical = false;
                 for (auto& edge : rightEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
+                    if ((x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         horizontal = true;
                         break;
                     }
                 }
                 for (auto& edge : bottomEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) {
+                    if ((x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge)) ) {
                         vertical = true;
                         break;
                     }
@@ -233,13 +233,13 @@ void Ball::runBall() {
                 bool horizontal = false;
                 bool vertical = false;
                 for (auto& edge : leftEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
+                    if ((x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         horizontal = true;
                         break;
                     }
                 }
                 for (auto& edge : topEdgeCoordinates) {
-                    if (x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
+                    if ((x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         vertical = true;
                         break;
                     }
@@ -266,13 +266,13 @@ void Ball::runBall() {
                 bool horizontal = false;
                 bool vertical = false;
                 for (auto& edge : rightEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
+                    if ((x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         horizontal = true;
                         break;
                     }
                 }
                 for (auto& edge : topEdgeCoordinates) {
-                    if (x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) {
+                    if ((x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
                         vertical = true;
                         break;
                     }
