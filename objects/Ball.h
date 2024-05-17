@@ -20,6 +20,9 @@ class Ball {
     int max_x, min_x; // maximum and minimum x coordinate of the ball
     int bounces = 0;
     int speed;
+    int base_sleep = 100;
+
+    bool justBounced = false;
 
     int horizontalDirection; // 1 - right, -1 - left, 0 - no movement
     int verticalDirection = -1; // 1 - down, -1 - up, 0 - no movement

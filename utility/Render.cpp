@@ -89,10 +89,10 @@ void Render::drawBorder() {
 
 
 void Render::drawRectangle() {
-    const auto&x = rectangle->x;
-    const auto&y = rectangle->y;
-    const auto&height = rectangle->height;
-    const auto&width = rectangle->width;
+    const auto&x = rectangle->getX();
+    const auto&y = rectangle->getY();
+    const auto&height = rectangle->getHeight();
+    const auto&width = rectangle->getWidth();
 
     // Draw top and bottom
     mvhline(y, x, 0, width);
@@ -127,6 +127,7 @@ void Render::drawBalls() {
 
 void Render::draw() {
     drawBorder();
+    // std::unique_lock posLock(rectangle->mtx);
     drawRectangle();
     drawBalls();
 }
