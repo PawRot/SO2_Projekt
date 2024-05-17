@@ -127,6 +127,7 @@ void Render::drawBalls() {
 
 void Render::draw() {
     drawBorder();
+    std::unique_lock posLock(rectangle->mtx);
     drawRectangle();
     drawBalls();
 }
