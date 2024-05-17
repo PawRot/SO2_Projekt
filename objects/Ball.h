@@ -22,7 +22,7 @@ class Ball {
     int speed;
     int base_sleep = 100;
 
-    bool justBounced = false;
+    int insideCounter = 0;
 
     int horizontalDirection; // 1 - right, -1 - left, 0 - no movement
     int verticalDirection = -1; // 1 - down, -1 - up, 0 - no movement

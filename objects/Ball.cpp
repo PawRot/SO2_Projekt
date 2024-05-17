@@ -50,31 +50,6 @@ void Ball::runBall() {
         const int rectX = rectanglePtr->getX();
         const int rectWidth = rectanglePtr->getWidth();
 
-
-
-        // for collisions with the rectangle, we only check the field in the direction in which the ball is moving
-        // for example if the ball is moving up, we only check the field above the ball
-        // this is because the ball moves in a straight line and we can assume that the ball will not collide with the rectangle if it is not in the same row or column
-        // we also need to check collisions when the ball is moving diagonally
-        // in this case we need to check the fields in the direction of the ball's movement both vertically and horizontally and the diagonal field
-        // this is because the ball can collide with the rectangle if it is not in the same row or column
-        // but it is in the diagonal field
-        // in summary, the possible options are as follows:
-        // 1. the ball is moving horizontally to the right
-        // 2. the ball is moving horizontally to the left
-        // 3. the ball is moving vertically up
-        // 4. the ball is moving vertically down
-        // 5. the ball is moving diagonally up and to the right
-        // 6. the ball is moving diagonally up and to the left
-        // 7. the ball is moving diagonally down and to the right
-        // 8. the ball is moving diagonally down and to the left
-
-
-        // check if the ball x coordinate is in the range of the rectangle x coordinates + 10
-        // Get the rectangle's x-coordinate and width
-
-
-
         // Check if the ball's x-coordinate is within the range
         if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) {
             // The ball's x-coordinate is within the range
@@ -88,7 +63,13 @@ void Ball::runBall() {
             const int rectHeight = rectanglePtr->getHeight();
 
             // Check if the next position is within the rectangle's boundaries
-            if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight && !justBounced) {
+            if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight) {
+                insideCounter++;
+                if (insideCounter > 2) {
+                    bounces = MAX_BOUNCES;
+                    finished = true;
+                    break;
+                }
 
                 // The ball's next position will intersect with the rectangle
 
@@ -105,13 +86,13 @@ void Ball::runBall() {
                 const auto rectSleep = rectanglePtr->getBaseSleep();
                 if (verticalDirection == rectVertDirection && (rectSleep / rectSpeed) < (base_sleep / speed)) {
                     speed = (rectSpeed > 1) ? rectSpeed - 1 : rectSpeed;
-                    base_sleep = (rectSpeed == 1) ? rectSleep - 10 : rectSleep;
+                    base_sleep = (rectSpeed == 1) ? rectSleep - 15 : rectSleep;
                 }
             } else {
-                justBounced = false;
+                insideCounter = 0;
             }
 
-        }
+        } else lock.unlock();
 
         y = y + 1 * verticalDirection;
         x = x + 1 * horizontalDirection;
