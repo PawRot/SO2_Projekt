@@ -1,0 +1,2 @@
+Elementy, które mają być dodane na etapie 2:
+- Kulki odbijają się od prostokąta.
