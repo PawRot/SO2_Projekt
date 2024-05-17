@@ -64,6 +64,7 @@ void Ball::runBall() {
 
             // Check if the next position is within the rectangle's boundaries
             if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight) {
+                // The ball's next position will intersect with the rectangle
                 insideCounter++;
                 if (insideCounter > 2) {
                     bounces = MAX_BOUNCES;
@@ -71,25 +72,30 @@ void Ball::runBall() {
                     break;
                 }
 
-                // The ball's next position will intersect with the rectangle
+                if (!justBounced) {
 
-                // Reverse the ball's direction
-                horizontalDirection = -horizontalDirection;
-                verticalDirection = -verticalDirection;
+                    // Reverse the ball's direction
+                    horizontalDirection = -horizontalDirection;
+                    verticalDirection = -verticalDirection;
 
-                const auto rectVertDirection = rectanglePtr->getVerticalDirection();
-                if (verticalDirection == 0) {
-                    verticalDirection = rectVertDirection;
-                }
 
-                const auto rectSpeed = rectanglePtr->getSpeed();
-                const auto rectSleep = rectanglePtr->getBaseSleep();
-                if (verticalDirection == rectVertDirection && (rectSleep / rectSpeed) < (base_sleep / speed)) {
-                    speed = (rectSpeed > 1) ? rectSpeed - 1 : rectSpeed;
-                    base_sleep = (rectSpeed == 1) ? rectSleep - 15 : rectSleep;
+                    const auto rectVertDirection = rectanglePtr->getVerticalDirection();
+                    if (verticalDirection == 0 && x >= rectX && x <= rectX + rectWidth) {
+                        verticalDirection = rectVertDirection;
+                        y = y + 1 * verticalDirection;
+                    }
+
+                    const auto rectSpeed = rectanglePtr->getSpeed();
+                    const auto rectSleep = rectanglePtr->getBaseSleep();
+                    if (verticalDirection == rectVertDirection && (rectSleep / rectSpeed) < (base_sleep / speed)) {
+                        speed = (rectSpeed > 1) ? rectSpeed - 1 : rectSpeed;
+                        base_sleep = (rectSpeed == 1) ? rectSleep - 15 : rectSleep;
+                    }
+                    justBounced = true;
                 }
             } else {
                 insideCounter = 0;
+                justBounced = false;
             }
 
         } else lock.unlock();
