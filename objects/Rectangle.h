@@ -5,6 +5,7 @@
 #include <atomic>
 #include <random>
 #include <thread>
+#include <mutex>
 
 class Rectangle {
     int MAX_SPEED = 5; // maximum speed of the rectangle
