@@ -24,6 +24,7 @@ class Ball {
 
     int insideCounter = 0;
     bool justBounced = false;
+    bool bouncedFromRectangle = false;
 
     int horizontalDirection; // 1 - right, -1 - left, 0 - no movement
     int verticalDirection = -1; // 1 - down, -1 - up, 0 - no movement
@@ -48,6 +49,10 @@ public:
     Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr);
 
     ~Ball();
+
+    [[nodiscard]] bool getBouncedFromRectangle() const {
+        return bouncedFromRectangle;
+    }
 };
 
 

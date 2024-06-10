@@ -21,7 +21,7 @@ class Render {
 
     void spawnBall(); // function that spawns a ball, runs in a separate thread
 
-    void drawBorder(); // function that draws the border
+    static void drawBorder(); // function that draws the border
     void drawRectangle(); // function that draws the rectangle
     void drawBalls(); // function that draws the balls
 

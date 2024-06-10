@@ -115,10 +115,16 @@ void Render::drawBalls() {
             std::erase(balls, ball);
             delete ball;
         }
-        else {
+        else if (!ball->getBouncedFromRectangle()) {
             const auto color = ball->color;
             attron(COLOR_PAIR(color));
             mvaddch(ball->y, ball->x, 'o');
+            attroff(COLOR_PAIR(color));
+        }
+        else if (ball->getBouncedFromRectangle()) {
+            const auto color = ball->color;
+            attron(COLOR_PAIR(color));
+            mvaddch(ball->y, ball->x, 'X');
             attroff(COLOR_PAIR(color));
         }
     }

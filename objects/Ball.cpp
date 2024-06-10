@@ -73,6 +73,7 @@ void Ball::runBall() {
                 }
 
                 if (!justBounced) {
+                    bouncedFromRectangle = true;
 
                     // Reverse the ball's direction
                     horizontalDirection = -horizontalDirection;
@@ -107,6 +108,7 @@ void Ball::runBall() {
         std::uniform_int_distribution<> chance(0, 100);
 
         if (y >= max_y || y <= min_y) {
+            bouncedFromRectangle = false;
             if (y >= max_y) {
                 y = max_y;
             }
