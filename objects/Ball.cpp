@@ -40,8 +40,10 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 
 Ball::~Ball() {
     std::unique_lock queueLock(queueMtx);
-    if (waitingBalls->front() == this) {
-        waitingBalls->pop();
+    if (!waitingBalls->empty()) {
+        if (waitingBalls->front() == this) {
+            waitingBalls->pop();
+        }
     }
     queueLock.unlock();
     colors->at(color) = false;
@@ -52,7 +54,10 @@ Ball::~Ball() {
 void Ball::runBall() {
     while (*stopFlag != true && bounces < MAX_BOUNCES) {
 
-        if (bouncedFromRectangle && waitingInQueue) {
+        const int rectX = rectanglePtr->getX();
+        const int rectWidth = rectanglePtr->getWidth();
+
+        if (bouncedFromRectangle && waitingInQueue && !((x >= (rectX - 1) && x <= (rectX + rectWidth + 1)))) {
             std::unique_lock queueLock(queueMtx);
             if (waitingBalls->front() == this) {
                 waitingInQueue = false;
@@ -63,7 +68,7 @@ void Ball::runBall() {
                 while (!stopWaiting) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     queueLock.lock();
-                    if (waitingBalls->front() == this) {
+                    if (waitingBalls->front() == this || waitingBalls->empty()) {
                         waitingInQueue = false;
                         stopWaiting = true;
                     }
@@ -74,8 +79,7 @@ void Ball::runBall() {
 
         std::unique_lock lock(rectanglePtr->mtx);
 
-        const int rectX = rectanglePtr->getX();
-        const int rectWidth = rectanglePtr->getWidth();
+
 
         // Check if the ball's x-coordinate is within the range
         if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) {
@@ -213,8 +217,10 @@ void Ball::runBall() {
 
         if (bounces >= MAX_BOUNCES) {
             std::unique_lock queueLock(queueMtx);
-            if (waitingBalls->front() == this) {
-                waitingBalls->pop();
+            if (!waitingBalls->empty()) {
+                if (waitingBalls->front() == this) {
+                    waitingBalls->pop();
+                }
             }
             queueLock.unlock();
             finished = true;
