@@ -3,6 +3,8 @@
 #include <vector>
 #include <thread>
 #include <ncurses.h>
+#include <queue>
+
 #include "../objects/Ball.h"
 #include "../objects/Rectangle.h"
 
@@ -10,6 +12,7 @@
 class Render {
     std::vector<Ball *> balls{}; // stores pointers to ball objects
     Rectangle* rectangle{}; // stores pointer to rectangle object
+    std::queue<Ball *> waitingBalls{}; // queue that stores balls that have bounced from the rectangle
 
 
     std::thread* ballSpawnThread{};

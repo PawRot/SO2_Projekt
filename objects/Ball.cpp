@@ -1,9 +1,10 @@
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::queue<Ball *>* waitingBalls) {
     this->stopFlag = stopFlag;
     this->colors = colors;
     this->rectanglePtr = rectanglePtr;
+    this->waitingBalls = waitingBalls;
 
     min_y = 0 + 1;
     max_y = windowHeight;
@@ -38,6 +39,9 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 }
 
 Ball::~Ball() {
+    if (waitingBalls->front() == this) {
+        waitingBalls->pop();
+    }
     colors->at(color) = false;
     ballThread->join();
     delete ballThread;
@@ -45,6 +49,22 @@ Ball::~Ball() {
 
 void Ball::runBall() {
     while (*stopFlag != true && bounces < MAX_BOUNCES) {
+
+        if (bouncedFromRectangle && waitingInQueue) {
+            if (waitingBalls->front() == this) {
+                waitingInQueue = false;
+            } else {
+                auto stopWaiting = false;
+                while (!stopWaiting) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    if (waitingBalls->front() == this) {
+                        waitingInQueue = false;
+                        stopWaiting = true;
+                    }
+                }
+            }
+        }
+
         std::unique_lock lock(rectanglePtr->mtx);
 
         const int rectX = rectanglePtr->getX();
@@ -66,14 +86,20 @@ void Ball::runBall() {
             if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight) {
                 // The ball's next position will intersect with the rectangle
                 insideCounter++;
-                if (insideCounter > 2) {
+                if (insideCounter > 2 && !bouncedFromRectangle) {
+                    lock.unlock();
                     bounces = MAX_BOUNCES;
                     finished = true;
                     break;
                 }
 
                 if (!justBounced) {
-                    bouncedFromRectangle = true;
+                    if (!bouncedFromRectangle) {
+                        bouncedFromRectangle = true;
+                        waitingInQueue = true;
+                        waitingBalls->push(this);
+                    }
+
 
                     // Reverse the ball's direction
                     horizontalDirection = -horizontalDirection;
@@ -108,7 +134,11 @@ void Ball::runBall() {
         std::uniform_int_distribution<> chance(0, 100);
 
         if (y >= max_y || y <= min_y) {
-            bouncedFromRectangle = false;
+            if (bouncedFromRectangle) {
+                bouncedFromRectangle = false;
+                waitingBalls->pop();
+                // notify here
+            }
             if (y >= max_y) {
                 y = max_y;
             }
@@ -136,6 +166,12 @@ void Ball::runBall() {
         }
 
         if (x >= max_x || x <= min_x) {
+            if (bouncedFromRectangle) {
+                bouncedFromRectangle = false;
+                waitingBalls->pop();
+                // notify here
+            }
+
             if (x >= max_x) {
                 x = max_x;
             }
@@ -163,6 +199,9 @@ void Ball::runBall() {
         }
 
         if (bounces >= MAX_BOUNCES) {
+            if (waitingBalls->front() == this) {
+                waitingBalls->pop();
+            }
             finished = true;
         }
 

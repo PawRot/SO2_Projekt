@@ -72,7 +72,7 @@ void Render::spawnBall() {
     while (stopFlag != true) {
         {
             std::unique_lock spawnLock(mtx);
-            auto ball = new Ball(width, height, &stopFlag, &colors, rectangle);
+            auto ball = new Ball(width, height, &stopFlag, &colors, rectangle, &waitingBalls);
             balls.push_back(ball);
         }
         std::random_device rd;

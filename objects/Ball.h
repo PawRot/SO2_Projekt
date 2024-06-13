@@ -2,6 +2,7 @@
 #define SO2_PROJEKT_BALL_H
 
 #include <atomic>
+#include <queue>
 #include <thread>
 #include <random>
 
@@ -25,6 +26,7 @@ class Ball {
     int insideCounter = 0;
     bool justBounced = false;
     bool bouncedFromRectangle = false;
+    bool waitingInQueue = false;
 
     int horizontalDirection; // 1 - right, -1 - left, 0 - no movement
     int verticalDirection = -1; // 1 - down, -1 - up, 0 - no movement
@@ -34,6 +36,8 @@ class Ball {
     std::thread* ballThread; // thread that runs the ball
 
     std::atomic_bool* stopFlag; // flag that indicates that the ball should stop
+
+    std::queue<Ball *>* waitingBalls; // pointer to queue that stores balls that have bounced from the rectangle
 
     [[nodiscard]] int generateSpeed() const; // function that generates speed of the ball
     void runBall(); // function that runs the ball
@@ -46,7 +50,7 @@ public:
     bool finished = false; // flag that indicates that the ball finished bouncing
 
 
-    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr);
+    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::queue<Ball *>* waitingBalls);
 
     ~Ball();
 
