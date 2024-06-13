@@ -37,7 +37,7 @@ class Ball {
 
     std::atomic_bool* stopFlag; // flag that indicates that the ball should stop
 
-    std::queue<Ball *>* waitingBalls; // pointer to queue that stores balls that have bounced from the rectangle
+    std::vector<Ball *>* waitingBalls; // pointer to queue that stores balls that have bounced from the rectangle
 
     inline static std::mutex queueMtx; // mutex that protects the queue
 
@@ -52,7 +52,7 @@ public:
     bool finished = false; // flag that indicates that the ball finished bouncing
 
 
-    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::queue<Ball *>* waitingBalls);
+    Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::vector<Ball *>* waitingBalls);
 
     ~Ball();
 

@@ -1,6 +1,6 @@
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::queue<Ball *>* waitingBalls) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::vector<Ball *>* waitingBalls) {
     this->stopFlag = stopFlag;
     this->colors = colors;
     this->rectanglePtr = rectanglePtr;
@@ -41,9 +41,7 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 Ball::~Ball() {
     std::unique_lock queueLock(queueMtx);
     if (!waitingBalls->empty()) {
-        if (waitingBalls->front() == this) {
-            waitingBalls->pop();
-        }
+        std::erase(*waitingBalls, this);
     }
     queueLock.unlock();
     colors->at(color) = false;
@@ -109,7 +107,7 @@ void Ball::runBall() {
                         bouncedFromRectangle = true;
                         waitingInQueue = true;
                         std::unique_lock queueLock(queueMtx);
-                        waitingBalls->push(this);
+                        waitingBalls->push_back(this);
                         queueLock.unlock();
                     }
 
@@ -150,7 +148,7 @@ void Ball::runBall() {
             if (bouncedFromRectangle) {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
-                waitingBalls->pop();
+                std::erase(*waitingBalls, this);
                 queueLock.unlock();
                 // notify here
             }
@@ -184,7 +182,7 @@ void Ball::runBall() {
             if (bouncedFromRectangle) {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
-                waitingBalls->pop();
+                std::erase(*waitingBalls, this);
                 queueLock.unlock();
                 // notify here
             }
@@ -218,9 +216,7 @@ void Ball::runBall() {
         if (bounces >= MAX_BOUNCES) {
             std::unique_lock queueLock(queueMtx);
             if (!waitingBalls->empty()) {
-                if (waitingBalls->front() == this) {
-                    waitingBalls->pop();
-                }
+                std::erase(*waitingBalls, this);
             }
             queueLock.unlock();
             finished = true;
