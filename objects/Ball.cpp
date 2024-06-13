@@ -39,9 +39,11 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 }
 
 Ball::~Ball() {
+    std::unique_lock queueLock(queueMtx);
     if (waitingBalls->front() == this) {
         waitingBalls->pop();
     }
+    queueLock.unlock();
     colors->at(color) = false;
     ballThread->join();
     delete ballThread;
@@ -51,16 +53,21 @@ void Ball::runBall() {
     while (*stopFlag != true && bounces < MAX_BOUNCES) {
 
         if (bouncedFromRectangle && waitingInQueue) {
+            std::unique_lock queueLock(queueMtx);
             if (waitingBalls->front() == this) {
                 waitingInQueue = false;
+                queueLock.unlock();
             } else {
                 auto stopWaiting = false;
+                queueLock.unlock();
                 while (!stopWaiting) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    queueLock.lock();
                     if (waitingBalls->front() == this) {
                         waitingInQueue = false;
                         stopWaiting = true;
                     }
+                    queueLock.unlock();
                 }
             }
         }
@@ -97,7 +104,9 @@ void Ball::runBall() {
                     if (!bouncedFromRectangle) {
                         bouncedFromRectangle = true;
                         waitingInQueue = true;
+                        std::unique_lock queueLock(queueMtx);
                         waitingBalls->push(this);
+                        queueLock.unlock();
                     }
 
 
@@ -136,7 +145,9 @@ void Ball::runBall() {
         if (y >= max_y || y <= min_y) {
             if (bouncedFromRectangle) {
                 bouncedFromRectangle = false;
+                std::unique_lock queueLock(queueMtx);
                 waitingBalls->pop();
+                queueLock.unlock();
                 // notify here
             }
             if (y >= max_y) {
@@ -168,7 +179,9 @@ void Ball::runBall() {
         if (x >= max_x || x <= min_x) {
             if (bouncedFromRectangle) {
                 bouncedFromRectangle = false;
+                std::unique_lock queueLock(queueMtx);
                 waitingBalls->pop();
+                queueLock.unlock();
                 // notify here
             }
 
@@ -199,9 +212,11 @@ void Ball::runBall() {
         }
 
         if (bounces >= MAX_BOUNCES) {
+            std::unique_lock queueLock(queueMtx);
             if (waitingBalls->front() == this) {
                 waitingBalls->pop();
             }
+            queueLock.unlock();
             finished = true;
         }
 

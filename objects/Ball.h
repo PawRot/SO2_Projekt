@@ -39,6 +39,8 @@ class Ball {
 
     std::queue<Ball *>* waitingBalls; // pointer to queue that stores balls that have bounced from the rectangle
 
+    inline static std::mutex queueMtx; // mutex that protects the queue
+
     [[nodiscard]] int generateSpeed() const; // function that generates speed of the ball
     void runBall(); // function that runs the ball
 
