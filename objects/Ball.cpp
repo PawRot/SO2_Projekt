@@ -42,7 +42,7 @@ Ball::~Ball() {
     std::unique_lock queueLock(queueMtx);
     if (!waitingBalls->empty()) {
         std::erase(*waitingBalls, this);
-        queueCV.notify_one();
+        queueCV.notify_all();
     }
     queueLock.unlock();
     colors->at(color) = false;
@@ -162,7 +162,7 @@ void Ball::runBall() {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
                 std::erase(*waitingBalls, this);
-                queueCV.notify_one();
+                queueCV.notify_all();
                 queueLock.unlock();
                 // notify here
             }
@@ -197,7 +197,7 @@ void Ball::runBall() {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
                 std::erase(*waitingBalls, this);
-                queueCV.notify_one();
+                queueCV.notify_all();
                 queueLock.unlock();
                 // notify here
             }
@@ -232,7 +232,7 @@ void Ball::runBall() {
             std::unique_lock queueLock(queueMtx);
             if (!waitingBalls->empty()) {
                 std::erase(*waitingBalls, this);
-                queueCV.notify_one();
+                queueCV.notify_all();
             }
             queueLock.unlock();
             finished = true;
