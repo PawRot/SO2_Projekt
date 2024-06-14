@@ -71,13 +71,15 @@ void Render::runRender() {
 void Render::spawnBall() {
     while (stopFlag != true) {
         {
-            std::unique_lock spawnLock(mtx);
-            auto ball = new Ball(width, height, &stopFlag, &colors, rectangle, &waitingBalls);
-            balls.push_back(ball);
+            if (balls.size() < MAX_BALLS) {
+                std::unique_lock spawnLock(mtx);
+                auto ball = new Ball(width, height, &stopFlag, &colors, rectangle, &waitingBalls);
+                balls.push_back(ball);
+            }
         }
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(1000, 1500);
+        std::uniform_int_distribution<> distr(300, 600);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(distr(gen)));
     }

@@ -12,12 +12,13 @@
 class Render {
     std::vector<Ball *> balls{}; // stores pointers to ball objects
     Rectangle* rectangle{}; // stores pointer to rectangle object
-    std::queue<Ball *> waitingBalls{}; // queue that stores balls that have bounced from the rectangle
+    std::vector<Ball *> waitingBalls{}; // queue that stores balls that have bounced from the rectangle
 
 
     std::thread* ballSpawnThread{};
 
     const int RENDER_SLEEP_TIME = 16666; // time in microseconds between each render
+    const int MAX_BALLS = 20; // maximum number of balls
 
 
     int width, height; // width - number of columns, height - number of rows
