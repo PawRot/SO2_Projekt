@@ -43,6 +43,8 @@ class Ball {
 
     inline static std::mutex queueMtx; // mutex that protects the queue
 
+    inline static std::mutex waitMtx; // mutex that is used with the condition variable
+
     [[nodiscard]] int generateSpeed() const; // function that generates speed of the ball
     void runBall(); // function that runs the ball
 

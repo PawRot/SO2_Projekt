@@ -66,7 +66,9 @@ void Ball::runBall() {
                 waitingInQueue = false;
                 queueLock.unlock();
             } else {
-                queueCV.wait(queueLock, [&] { return waitingBalls->front() == this || waitingBalls->empty() || *stopFlag == true; });
+                queueLock.unlock();
+                std::unique_lock waitLock(waitMtx);
+                queueCV.wait(waitLock, [&] { return waitingBalls->front() == this || waitingBalls->empty() || *stopFlag == true; });
                 if (*stopFlag == true) {
                     finished = true;
                     break;
