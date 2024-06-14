@@ -39,6 +39,8 @@ class Ball {
 
     std::vector<Ball *>* waitingBalls; // pointer to queue that stores balls that have bounced from the rectangle
 
+    inline static std::condition_variable queueCV; // condition variable that is notified when a ball is removed from the queue
+
     inline static std::mutex queueMtx; // mutex that protects the queue
 
     [[nodiscard]] int generateSpeed() const; // function that generates speed of the ball
@@ -59,6 +61,8 @@ public:
     [[nodiscard]] bool getBouncedFromRectangle() const {
         return bouncedFromRectangle;
     }
+
+    static void notifyAllBalls();
 };
 
 

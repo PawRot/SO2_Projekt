@@ -42,11 +42,16 @@ Ball::~Ball() {
     std::unique_lock queueLock(queueMtx);
     if (!waitingBalls->empty()) {
         std::erase(*waitingBalls, this);
+        queueCV.notify_one();
     }
     queueLock.unlock();
     colors->at(color) = false;
     ballThread->join();
     delete ballThread;
+}
+
+void Ball::notifyAllBalls() {
+    queueCV.notify_all();
 }
 
 void Ball::runBall() {
@@ -61,17 +66,23 @@ void Ball::runBall() {
                 waitingInQueue = false;
                 queueLock.unlock();
             } else {
-                auto stopWaiting = false;
-                queueLock.unlock();
-                while (!stopWaiting) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                    queueLock.lock();
-                    if (waitingBalls->front() == this || waitingBalls->empty()) {
-                        waitingInQueue = false;
-                        stopWaiting = true;
-                    }
-                    queueLock.unlock();
+                queueCV.wait(queueLock, [&] { return waitingBalls->front() == this || waitingBalls->empty() || *stopFlag == true; });
+                if (*stopFlag == true) {
+                    finished = true;
+                    break;
                 }
+                waitingInQueue = false;
+                // auto stopWaiting = false;
+                // queueLock.unlock();
+                // while (!stopWaiting) {
+                //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                //     queueLock.lock();
+                //     if (waitingBalls->front() == this || waitingBalls->empty()) {
+                //         waitingInQueue = false;
+                //         stopWaiting = true;
+                //     }
+                //     queueLock.unlock();
+                // }
             }
         }
 
@@ -149,6 +160,7 @@ void Ball::runBall() {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
                 std::erase(*waitingBalls, this);
+                queueCV.notify_one();
                 queueLock.unlock();
                 // notify here
             }
@@ -183,6 +195,7 @@ void Ball::runBall() {
                 bouncedFromRectangle = false;
                 std::unique_lock queueLock(queueMtx);
                 std::erase(*waitingBalls, this);
+                queueCV.notify_one();
                 queueLock.unlock();
                 // notify here
             }
@@ -217,6 +230,7 @@ void Ball::runBall() {
             std::unique_lock queueLock(queueMtx);
             if (!waitingBalls->empty()) {
                 std::erase(*waitingBalls, this);
+                queueCV.notify_one();
             }
             queueLock.unlock();
             finished = true;
