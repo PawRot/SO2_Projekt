@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include <random>
+#include <condition_variable>
 
 #include "Rectangle.h"
 
