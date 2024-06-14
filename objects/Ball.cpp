@@ -74,17 +74,6 @@ void Ball::runBall() {
                     break;
                 }
                 waitingInQueue = false;
-                // auto stopWaiting = false;
-                // queueLock.unlock();
-                // while (!stopWaiting) {
-                //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                //     queueLock.lock();
-                //     if (waitingBalls->front() == this || waitingBalls->empty()) {
-                //         waitingInQueue = false;
-                //         stopWaiting = true;
-                //     }
-                //     queueLock.unlock();
-                // }
             }
         }
 

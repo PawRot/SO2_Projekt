@@ -57,25 +57,6 @@ void Rectangle::runRectangle() {
     }
 }
 
-// void Rectangle::calculateEdges() {
-//     // Clear previous edge coordinates
-//     topEdgeCoordinates.clear();
-//     bottomEdgeCoordinates.clear();
-//     leftEdgeCoordinates.clear();
-//     rightEdgeCoordinates.clear();
-//
-//     // Calculate top and bottom edge coordinates
-//     for (int i = x; i <= x + width; i++) {
-//         topEdgeCoordinates.emplace_back(i, y);
-//         bottomEdgeCoordinates.emplace_back(i, y + height);
-//     }
-//
-//     // Calculate left and right edge coordinates
-//     for (int i = y; i <= y + height; i++) {
-//         leftEdgeCoordinates.emplace_back(x, i);
-//         rightEdgeCoordinates.emplace_back(x + width, i);
-//     }
-// }
 
 int Rectangle::generateSpeed() const {
     std::random_device rd;
