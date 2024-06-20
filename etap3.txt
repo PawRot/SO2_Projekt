@@ -1,0 +1,4 @@
+Piłka odbita od prostokąta do czasu uderzenia w krawędź zmienia swój typ (zmienić wizualizacje).
+Tylko jedna piłka tego typu może się poruszać
+Kolejne tego typu czekają aż poprzedzająca je zniknie lub zmieni się z powrotem w zwykłą piłkę
+(piłki zatrzymują się dopiero kiedy wyjdą z obszaru możliwego zderzenia z prostokątem)
