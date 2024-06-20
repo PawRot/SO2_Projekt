@@ -199,23 +199,11 @@ void Ball::runBall() {
             }
 
 
-            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
-                if (verticalDirection == 0) {
-                    if (chance(gen) < 50) {
-                        verticalDirection = 1;
-                    }
-                    else {
-                        verticalDirection = -1;
-                    }
-                }
-                else {
-                    verticalDirection = 0;
-                }
-            }
+        int rectX = rectanglePtr->x;
+        int rectWidth = rectanglePtr->width;
 
-            horizontalDirection = -horizontalDirection;
-            bounces++;
-        }
+        // Check if the ball's x-coordinate is within the range
+        // if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) lock.unlock();
 
         if (bounces >= MAX_BOUNCES) {
             std::unique_lock queueLock(queueMtx);
