@@ -71,13 +71,15 @@ void Render::runRender() {
 void Render::spawnBall() {
     while (stopFlag != true) {
         {
-            std::unique_lock spawnLock(mtx);
-            auto ball = new Ball(width, height, &stopFlag, &colors, rectangle);
-            balls.push_back(ball);
+            if (balls.size() < MAX_BALLS) {
+                std::unique_lock spawnLock(mtx);
+                auto ball = new Ball(width, height, &stopFlag, &colors, rectangle, &waitingBalls);
+                balls.push_back(ball);
+            }
         }
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distr(1000, 1500);
+        std::uniform_int_distribution<> distr(300, 600);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(distr(gen)));
     }
@@ -89,10 +91,10 @@ void Render::drawBorder() {
 
 
 void Render::drawRectangle() {
-    const auto&x = rectangle->x;
-    const auto&y = rectangle->y;
-    const auto&height = rectangle->height;
-    const auto&width = rectangle->width;
+    const auto&x = rectangle->getX();
+    const auto&y = rectangle->getY();
+    const auto&height = rectangle->getHeight();
+    const auto&width = rectangle->getWidth();
 
     // Draw top and bottom
     mvhline(y, x, 0, width);
@@ -115,10 +117,16 @@ void Render::drawBalls() {
             std::erase(balls, ball);
             delete ball;
         }
-        else {
+        else if (!ball->getBouncedFromRectangle()) {
             const auto color = ball->color;
             attron(COLOR_PAIR(color));
             mvaddch(ball->y, ball->x, 'o');
+            attroff(COLOR_PAIR(color));
+        }
+        else if (ball->getBouncedFromRectangle()) {
+            const auto color = ball->color;
+            attron(COLOR_PAIR(color));
+            mvaddch(ball->y, ball->x, 'X');
             attroff(COLOR_PAIR(color));
         }
     }

@@ -37,7 +37,7 @@ void Rectangle::runRectangle() {
     while (*stopFlag != true) {
         std::unique_lock lock(mtx);
         y = y + 1 * direction;
-        calculateEdges();
+        // calculateEdges();
         lock.unlock();
         if (y >= max_y || y <= min_y) {
             if (y >= max_y) {
@@ -53,31 +53,12 @@ void Rectangle::runRectangle() {
 
         // calculate the coordinates of the edges of the rectangle
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(250 / speed));
+        std::this_thread::sleep_for(std::chrono::milliseconds(BASE_SLEEP / speed));
     }
 }
 
-void Rectangle::calculateEdges() {
-    // Clear previous edge coordinates
-    topEdgeCoordinates.clear();
-    bottomEdgeCoordinates.clear();
-    leftEdgeCoordinates.clear();
-    rightEdgeCoordinates.clear();
 
-    // Calculate top and bottom edge coordinates
-    for (int i = x; i <= x + width; i++) {
-        topEdgeCoordinates.emplace_back(i, y);
-        bottomEdgeCoordinates.emplace_back(i, y + height);
-    }
-
-    // Calculate left and right edge coordinates
-    for (int i = y; i <= y + height; i++) {
-        leftEdgeCoordinates.emplace_back(x, i);
-        rightEdgeCoordinates.emplace_back(x + width, i);
-    }
-}
-
-int Rectangle::generateSpeed() {
+int Rectangle::generateSpeed() const {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(1, MAX_SPEED);

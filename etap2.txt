@@ -1,0 +1,8 @@
+Elementy, które mają być dodane na etapie 2:
+- Kulki odbijają się od prostokąta.
+
+Opis zasad odbić:
+- Kulki po odbiciu od prostokąta lecą w kierunku przeciwnym do kierunku, w którym leciały przed odbiciem.
+- Jeśli kulka lecąca poziomo zostanie uderzona przez prostokąt, to zaczyna poruszać się po skosie.
+    - W tej sytuacji, jeśli jej prędkość jest mniejsza od prędkości prostokąta, to zostaje przyśpieszona.
+- Kulka "zgnieciona" między prostokątem a ścianą znika.

@@ -1,9 +1,10 @@
 #include "Ball.h"
 
-Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr) {
+Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::vector<bool>* colors, Rectangle* rectanglePtr, std::vector<Ball *>* waitingBalls) {
     this->stopFlag = stopFlag;
     this->colors = colors;
     this->rectanglePtr = rectanglePtr;
+    this->waitingBalls = waitingBalls;
 
     min_y = 0 + 1;
     max_y = windowHeight;
@@ -38,265 +39,106 @@ Ball::Ball(int windowWidth, int windowHeight, std::atomic_bool* stopFlag, std::v
 }
 
 Ball::~Ball() {
+    std::unique_lock queueLock(queueMtx);
+    if (!waitingBalls->empty()) {
+        std::erase(*waitingBalls, this);
+        queueCV.notify_all();
+    }
+    queueLock.unlock();
     colors->at(color) = false;
     ballThread->join();
     delete ballThread;
 }
 
+void Ball::notifyAllBalls() {
+    queueCV.notify_all();
+}
+
 void Ball::runBall() {
     while (*stopFlag != true && bounces < MAX_BOUNCES) {
+
+        const int rectX = rectanglePtr->getX();
+        const int rectWidth = rectanglePtr->getWidth();
+
+        if (bouncedFromRectangle && waitingInQueue && !((x >= (rectX - 1) && x <= (rectX + rectWidth + 1)))) {
+            std::unique_lock queueLock(queueMtx);
+            if (waitingBalls->front() == this) {
+                waitingInQueue = false;
+                queueLock.unlock();
+            } else {
+                queueLock.unlock();
+                std::unique_lock waitLock(waitMtx);
+                queueCV.wait(waitLock, [&] { return waitingBalls->front() == this || waitingBalls->empty() || *stopFlag == true; });
+                if (*stopFlag == true) {
+                    finished = true;
+                    break;
+                }
+                waitingInQueue = false;
+            }
+        }
+
         std::unique_lock lock(rectanglePtr->mtx);
 
-        int rectX = rectanglePtr->x;
-        int rectWidth = rectanglePtr->width;
 
-        // Check if the ball's x-coordinate is within the range
-        // if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) lock.unlock();
-
-
-
-        // for collisions with the rectangle, we only check the field in the direction in which the ball is moving
-        // for example if the ball is moving up, we only check the field above the ball
-        // this is because the ball moves in a straight line and we can assume that the ball will not collide with the rectangle if it is not in the same row or column
-        // we also need to check collisions when the ball is moving diagonally
-        // in this case we need to check the fields in the direction of the ball's movement both vertically and horizontally and the diagonal field
-        // this is because the ball can collide with the rectangle if it is not in the same row or column
-        // but it is in the diagonal field
-        // in summary, the possible options are as follows:
-        // 1. the ball is moving horizontally to the right
-        // 2. the ball is moving horizontally to the left
-        // 3. the ball is moving vertically up
-        // 4. the ball is moving vertically down
-        // 5. the ball is moving diagonally up and to the right
-        // 6. the ball is moving diagonally up and to the left
-        // 7. the ball is moving diagonally down and to the right
-        // 8. the ball is moving diagonally down and to the left
-
-
-        // check if the ball x coordinate is in the range of the rectangle x coordinates + 10
-        // Get the rectangle's x-coordinate and width
-
-        // std::unique_lock lock(rectanglePtr->mtx);
-
-        // int rectX = rectanglePtr->x;
-        // int rectWidth = rectanglePtr->width;
 
         // Check if the ball's x-coordinate is within the range
         if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) {
             // The ball's x-coordinate is within the range
 
+            // Predict the ball's next position
+            const int nextX = x + horizontalDirection;
+            const int nextY = y + verticalDirection;
 
-            // possible mutex here, shared with rectangle
-            auto topEdgeCoordinates = rectanglePtr->topEdgeCoordinates;
-            auto bottomEdgeCoordinates = rectanglePtr->bottomEdgeCoordinates;
-            auto leftEdgeCoordinates = rectanglePtr->leftEdgeCoordinates;
-            auto rightEdgeCoordinates = rectanglePtr->rightEdgeCoordinates;
+            // Get the rectangle's position and size
+            const int rectY = rectanglePtr->getY();
+            const int rectHeight = rectanglePtr->getHeight();
 
-            // also check if the ball is in the rectangle's edge
-            if (horizontalDirection == 1 && verticalDirection == 0) { // right
-                for (auto& edge : leftEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) || x == std::get<0>(edge)) && y == std::get<1>(edge)) {
-                        horizontalDirection = -horizontalDirection;
-                        break;
-                    }
-                }
-
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == -1) {
-                            verticalDirection = -1;
-                        }
-                        break;
-                    }
+            // Check if the next position is within the rectangle's boundaries
+            if (nextX >= rectX && nextX <= rectX + rectWidth && nextY >= rectY && nextY <= rectY + rectHeight) {
+                // The ball's next position will intersect with the rectangle
+                insideCounter++;
+                if (insideCounter > 2 && !bouncedFromRectangle) {
+                    lock.unlock();
+                    bounces = MAX_BOUNCES;
+                    finished = true;
+                    break;
                 }
 
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == 1) {
-                            verticalDirection = 1;
-                        }
-                        break;
+                if (!justBounced) {
+                    if (!bouncedFromRectangle) {
+                        bouncedFromRectangle = true;
+                        waitingInQueue = true;
+                        std::unique_lock queueLock(queueMtx);
+                        waitingBalls->push_back(this);
+                        queueLock.unlock();
                     }
-                }
-            }
-            else if (horizontalDirection == -1 && verticalDirection == 0) { // left
-                for (auto& edge : rightEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) || x == std::get<0>(edge)) && y == std::get<1>(edge)) {
-                        horizontalDirection = -horizontalDirection;
-                        break;
-                    }
-                }
 
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == -1) {
-                            verticalDirection = -1;
-                        }
-                        break;
-                    }
-                }
 
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        if (rectanglePtr->getVerticalDirection() == 1) {
-                            verticalDirection = 1;
-                        }
-                        break;
-                    }
-                }
-
-            }
-            else if (horizontalDirection == 0 && verticalDirection == -1) { // up
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y - 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        verticalDirection = -verticalDirection;
-                        break;
-                    }
-                }
-            }
-            else if (horizontalDirection == 0 && verticalDirection == 1) { // down
-                for (auto& edge : topEdgeCoordinates) {
-                    if (x == std::get<0>(edge) && (y + 1 == std::get<1>(edge) || y == std::get<1>(edge))) {
-                        verticalDirection = -verticalDirection;
-                        break;
-                    }
-                }
-
-            } // rewrite this part, so that it check vertical, horizontal and diagonal fields
-            else if (horizontalDirection == 1 && verticalDirection == -1) { // right up
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : leftEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))){
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal || vertical) {
+                    // Reverse the ball's direction
                     horizontalDirection = -horizontalDirection;
                     verticalDirection = -verticalDirection;
+
+
+                    const auto rectVertDirection = rectanglePtr->getVerticalDirection();
+                    if (verticalDirection == 0 && x >= rectX && x <= rectX + rectWidth) {
+                        verticalDirection = rectVertDirection;
+                        y = y + 1 * verticalDirection;
+                    }
+
+                    const auto rectSpeed = rectanglePtr->getSpeed();
+                    const auto rectSleep = rectanglePtr->getBaseSleep();
+                    if (verticalDirection == rectVertDirection && (rectSleep / rectSpeed) < (base_sleep / speed)) {
+                        speed = (rectSpeed > 1) ? rectSpeed - 1 : rectSpeed;
+                        base_sleep = (rectSpeed == 1) ? rectSleep - 15 : rectSleep;
+                    }
+                    justBounced = true;
                 }
-
-                // if (horizontal && vertical) {
-                //     horizontalDirection = -horizontalDirection;
-                //     verticalDirection = -verticalDirection;
-                // }
-                // else if (horizontal) {
-                //     horizontalDirection = -horizontalDirection;
-                // }
-                // else if (vertical) {
-                //     verticalDirection = -verticalDirection;
-                // }
-
+            } else {
+                insideCounter = 0;
+                justBounced = false;
             }
-            else if (horizontalDirection == -1 && verticalDirection == -1) { // left up
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : rightEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : bottomEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) && y - 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge)) ) {
-                        vertical = true;
-                        break;
-                    }
-                }
 
-                if (horizontal || vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-
-                // if (horizontal && vertical) {
-                //     horizontalDirection = -horizontalDirection;
-                //     verticalDirection = -verticalDirection;
-                // }
-                // else if (horizontal) {
-                //     horizontalDirection = -horizontalDirection;
-                // }
-                // else if (vertical) {
-                //     verticalDirection = -verticalDirection;
-                // }
-
-            }
-            else if (horizontalDirection == 1 && verticalDirection == 1) { // right down
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : leftEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : topEdgeCoordinates) {
-                    if ((x + 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal || vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-
-                // if (horizontal && vertical) {
-                //     horizontalDirection = -horizontalDirection;
-                //     verticalDirection = -verticalDirection;
-                // }
-                // else if (horizontal) {
-                //     horizontalDirection = -horizontalDirection;
-                // }
-                // else if (vertical) {
-                //     verticalDirection = -verticalDirection;
-                // }
-
-            }
-            else if (horizontalDirection == -1 && verticalDirection == 1) { // left down
-                bool horizontal = false;
-                bool vertical = false;
-                for (auto& edge : rightEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        horizontal = true;
-                        break;
-                    }
-                }
-                for (auto& edge : topEdgeCoordinates) {
-                    if ((x - 1 == std::get<0>(edge) && y + 1 == std::get<1>(edge)) || (x == std::get<0>(edge) && y == std::get<1>(edge))) {
-                        vertical = true;
-                        break;
-                    }
-                }
-
-                if (horizontal || vertical) {
-                    horizontalDirection = -horizontalDirection;
-                    verticalDirection = -verticalDirection;
-                }
-
-                // if (horizontal && vertical) {
-                    // horizontalDirection = -horizontalDirection;
-                    // verticalDirection = -verticalDirection;
-                // }
-                // else if (horizontal) {
-                    // horizontalDirection = -horizontalDirection;
-                // }
-                // else if (vertical) {
-                    // verticalDirection = -verticalDirection;
-                // }
-            }
-        }
-
-
+        } else lock.unlock();
 
         y = y + 1 * verticalDirection;
         x = x + 1 * horizontalDirection;
@@ -305,6 +147,14 @@ void Ball::runBall() {
         std::uniform_int_distribution<> chance(0, 100);
 
         if (y >= max_y || y <= min_y) {
+            if (bouncedFromRectangle) {
+                bouncedFromRectangle = false;
+                std::unique_lock queueLock(queueMtx);
+                std::erase(*waitingBalls, this);
+                queueCV.notify_all();
+                queueLock.unlock();
+                // notify here
+            }
             if (y >= max_y) {
                 y = max_y;
             }
@@ -332,6 +182,15 @@ void Ball::runBall() {
         }
 
         if (x >= max_x || x <= min_x) {
+            if (bouncedFromRectangle) {
+                bouncedFromRectangle = false;
+                std::unique_lock queueLock(queueMtx);
+                std::erase(*waitingBalls, this);
+                queueCV.notify_all();
+                queueLock.unlock();
+                // notify here
+            }
+
             if (x >= max_x) {
                 x = max_x;
             }
@@ -340,36 +199,25 @@ void Ball::runBall() {
             }
 
 
-            if (chance(gen) < NON_STANDARD_BOUNCE_CHANCE) {
-                if (verticalDirection == 0) {
-                    if (chance(gen) < 50) {
-                        verticalDirection = 1;
-                    }
-                    else {
-                        verticalDirection = -1;
-                    }
-                }
-                else {
-                    verticalDirection = 0;
-                }
-            }
+        int rectX = rectanglePtr->x;
+        int rectWidth = rectanglePtr->width;
 
-            horizontalDirection = -horizontalDirection;
-            bounces++;
-        }
+        // Check if the ball's x-coordinate is within the range
+        // if (x >= (rectX - 10) && x <= (rectX + rectWidth + 10)) lock.unlock();
 
         if (bounces >= MAX_BOUNCES) {
+            std::unique_lock queueLock(queueMtx);
+            if (!waitingBalls->empty()) {
+                std::erase(*waitingBalls, this);
+                queueCV.notify_all();
+            }
+            queueLock.unlock();
             finished = true;
         }
 
 
-
-
-        if (lock.owns_lock()) {
-            lock.unlock();
-        }
-        // lock.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100 / speed));
+        if (lock.owns_lock()) lock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(base_sleep / speed));
 
     }
 }

@@ -3,6 +3,8 @@
 #include <vector>
 #include <thread>
 #include <ncurses.h>
+#include <queue>
+
 #include "../objects/Ball.h"
 #include "../objects/Rectangle.h"
 
@@ -10,18 +12,20 @@
 class Render {
     std::vector<Ball *> balls{}; // stores pointers to ball objects
     Rectangle* rectangle{}; // stores pointer to rectangle object
+    std::vector<Ball *> waitingBalls{}; // queue that stores balls that have bounced from the rectangle
 
 
     std::thread* ballSpawnThread{};
 
     const int RENDER_SLEEP_TIME = 16666; // time in microseconds between each render
+    const int MAX_BALLS = 20; // maximum number of balls
 
 
     int width, height; // width - number of columns, height - number of rows
 
     void spawnBall(); // function that spawns a ball, runs in a separate thread
 
-    void drawBorder(); // function that draws the border
+    static void drawBorder(); // function that draws the border
     void drawRectangle(); // function that draws the rectangle
     void drawBalls(); // function that draws the balls
 
